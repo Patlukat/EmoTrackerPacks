@@ -218,6 +218,12 @@ end
 -- Each scene is 0x1c bits long, chests at 0x0, switches at 0x4, collectibles at 0xc
 local function updateSceneFromSaveContext(segment, scene_index)
   local checks = scenes[scene_index]
+  if scene_index >= 0x00 and scene_index <= 0x0D then
+    if CFG_DUNGEON_IS_MQ[getIntForSceneIndex(scene_index)] then
+      checks = scenesMQ[scene_index]
+    end
+  end
+  
   if not checks then
     return
   end
@@ -317,7 +323,6 @@ local function updateFromSaveContextWithLimits(segment, minIndex, maxIndex)
   for i = 1, #orderedSceneIndices do
     local sceneIndex = orderedSceneIndices[i]
     if sceneIndex >= minIndex and sceneIndex < maxIndex then
-      local scene = scenes[sceneIndex]
       updateSceneFromSaveContext(segment, sceneIndex)
     end
   end
@@ -472,6 +477,11 @@ function updateChestsFromGlobalContext(segment)
   local scene_data  = LiveReadU32(ADDR_CURRENT_CHEST_FLAGS)
 
   local checks = scenes[scene_index]
+  if scene_index >= 0x00 and scene_index <= 0x0D then
+    if CFG_DUNGEON_IS_MQ[getIntForSceneIndex(scene_index)] then
+      checks = scenesMQ[scene_index]
+    end
+  end
   if checks then
     autotracker_debug(string.format("read live chest data for scene %x: %x", scene_index, scene_data), DBG_DETAIL)
     updateSceneTypeFromGlobalContext(scene_data, checks, 'chest')
@@ -494,6 +504,11 @@ function updateCollectionsFromGlobalContext(segment)
   local scene_data  = LiveReadU32(ADDR_CURRENT_COLLECTION_FLAGS)
 
   local checks = scenes[scene_index]
+  if scene_index >= 0x00 and scene_index <= 0x0D then
+    if CFG_DUNGEON_IS_MQ[getIntForSceneIndex(scene_index)] then
+      checks = scenesMQ[scene_index]
+    end
+  end
   if checks then
     autotracker_debug(string.format("read live collection data for scene %x: %x", scene_index, scene_data), DBG_DETAIL)
     updateSceneTypeFromGlobalContext(scene_data, checks, 'ground')
@@ -518,6 +533,11 @@ function updateSwitchesFromGlobalContext(segment)
   local scene_data  = LiveReadU32(ADDR_CURRENT_SWITCH_FLAGS)
 
   local checks = scenes[scene_index]
+  if scene_index >= 0x00 and scene_index <= 0x0D then
+    if CFG_DUNGEON_IS_MQ[getIntForSceneIndex(scene_index)] then
+      checks = scenesMQ[scene_index]
+    end
+  end
   if checks then
     autotracker_debug(string.format("read live switch data for scene %x: %x", scene_index, scene_data), DBG_DETAIL)
     updateSceneTypeFromGlobalContext(scene_data, checks, 'magic')
